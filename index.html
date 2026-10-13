@@ -1,0 +1,1859 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دراسة المنافسين - صالونات العناية بالأظافر | Sun Media</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --dark: #1a1a1a;
+    --darker: #111111;
+    --white: #ffffff;
+    --off-white: #f5f5f5;
+    --red: #e63946;
+    --red-dark: #c1121f;
+    --red-light: #ff6b6b;
+    --gray: #6b7280;
+    --gray-light: #9ca3af;
+    --gray-dark: #374151;
+    --border: #2a2a2a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: var(--black);
+    color: var(--white);
+    direction: rtl;
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  /* ===== PRESENTATION CONTAINER ===== */
+  .presentation {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .slide {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transform: translateX(-60px);
+    transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    pointer-events: none;
+    padding: 40px 60px;
+    overflow-y: auto;
+  }
+
+  .slide.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: all;
+  }
+
+  .slide.prev {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+
+  /* ===== NAVIGATION ===== */
+  .nav-controls {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    z-index: 100;
+    background: rgba(26,26,26,0.9);
+    backdrop-filter: blur(10px);
+    padding: 10px 24px;
+    border-radius: 50px;
+    border: 1px solid var(--border);
+  }
+
+  .nav-btn {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--red);
+    background: transparent;
+    color: var(--red);
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cairo', sans-serif;
+  }
+  .nav-btn:hover { background: var(--red); color: var(--white); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .nav-btn:disabled:hover { background: transparent; color: var(--red); }
+
+  .slide-counter {
+    color: var(--gray-light);
+    font-size: 14px;
+    font-weight: 600;
+    min-width: 60px;
+    text-align: center;
+  }
+
+  .progress-dots {
+    display: flex;
+    gap: 6px;
+  }
+  .progress-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--gray-dark);
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  .progress-dot.active {
+    background: var(--red);
+    width: 24px;
+    border-radius: 4px;
+  }
+
+  /* ===== GLOBAL DECORATIONS ===== */
+  .red-accent-line {
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--red), var(--red-light));
+    border-radius: 2px;
+    margin: 12px auto;
+  }
+
+  .corner-decoration {
+    position: absolute;
+    width: 120px; height: 120px;
+    border: 2px solid rgba(230,57,70,0.15);
+    pointer-events: none;
+  }
+  .corner-decoration.top-right { top: 20px; right: 20px; border-bottom: none; border-left: none; border-radius: 0 12px 0 0; }
+  .corner-decoration.bottom-left { bottom: 20px; left: 20px; border-top: none; border-right: none; border-radius: 0 0 0 12px; }
+
+  .floating-shapes {
+    position: absolute;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .floating-shapes .shape {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.04;
+  }
+  .floating-shapes .shape:nth-child(1) { width: 300px; height: 300px; background: var(--red); top: -50px; right: -50px; }
+  .floating-shapes .shape:nth-child(2) { width: 200px; height: 200px; background: var(--red); bottom: -30px; left: -30px; }
+  .floating-shapes .shape:nth-child(3) { width: 150px; height: 150px; background: var(--white); top: 50%; left: 10%; }
+
+  /* ===== SLIDE 0: COVER ===== */
+  .cover-slide {
+    background: linear-gradient(135deg, var(--black) 0%, var(--darker) 50%, var(--dark) 100%);
+    text-align: center;
+    position: relative;
+  }
+  .cover-slide::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(circle at 80% 20%, rgba(230,57,70,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 20% 80%, rgba(230,57,70,0.05) 0%, transparent 50%);
+  }
+
+  .cover-logo {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 20px;
+    filter: brightness(1.1);
+    border-radius: 12px;
+  }
+
+  .cover-title {
+    font-size: 48px;
+    font-weight: 900;
+    line-height: 1.3;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, var(--white) 0%, var(--off-white) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .cover-subtitle {
+    font-size: 22px;
+    color: var(--red);
+    font-weight: 700;
+    margin-bottom: 16px;
+    letter-spacing: 1px;
+  }
+
+  .cover-description {
+    font-size: 16px;
+    color: var(--gray-light);
+    font-weight: 400;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.8;
+  }
+
+  .cover-meta {
+    margin-top: 40px;
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .cover-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--gray-light);
+    font-size: 14px;
+  }
+  .cover-meta-item .icon {
+    color: var(--red);
+    font-size: 18px;
+  }
+
+  /* ===== SLIDE: SECTION HEADERS ===== */
+  .section-header {
+    text-align: center;
+    position: relative;
+  }
+  .section-number {
+    font-size: 120px;
+    font-weight: 900;
+    color: rgba(230,57,70,0.08);
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    line-height: 1;
+  }
+  .section-title {
+    font-size: 42px;
+    font-weight: 800;
+    color: var(--white);
+    position: relative;
+    z-index: 1;
+    margin-bottom: 12px;
+  }
+  .section-subtitle {
+    font-size: 18px;
+    color: var(--gray-light);
+    font-weight: 400;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.8;
+  }
+
+  /* ===== COMPETITOR CARDS ===== */
+  .competitor-slide {
+    display: flex;
+    gap: 40px;
+    align-items: stretch;
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px 0;
+  }
+
+  .comp-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .comp-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 8px;
+  }
+
+  .comp-rank {
+    width: 56px; height: 56px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--red), var(--red-dark));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--white);
+    flex-shrink: 0;
+  }
+
+  .comp-name {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--white);
+  }
+  .comp-name-en {
+    font-size: 14px;
+    color: var(--red);
+    font-weight: 600;
+  }
+
+  .comp-location {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--gray-light);
+    font-size: 14px;
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  .comp-features {
+    font-size: 14px;
+    color: var(--gray-light);
+    line-height: 1.9;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 8px;
+    border-right: 3px solid var(--red);
+  }
+
+  .comp-sidebar {
+    width: 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .comp-card {
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+  .comp-card.strengths {
+    background: rgba(16, 185, 129, 0.04);
+    border-color: rgba(16, 185, 129, 0.2);
+  }
+  .comp-card.weaknesses {
+    background: rgba(239, 68, 68, 0.04);
+    border-color: rgba(239, 68, 68, 0.2);
+  }
+
+  .comp-card-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .comp-card.strengths .comp-card-title { color: #10b981; }
+  .comp-card.weaknesses .comp-card-title { color: #ef4444; }
+
+  .comp-card ul {
+    list-style: none;
+    padding: 0;
+  }
+  .comp-card li {
+    font-size: 13px;
+    color: var(--gray-light);
+    padding: 4px 0;
+    line-height: 1.7;
+    position: relative;
+    padding-right: 16px;
+  }
+  .comp-card li::before {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 12px;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+  }
+  .comp-card.strengths li::before { background: #10b981; }
+  .comp-card.weaknesses li::before { background: #ef4444; }
+
+  .rating-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,193,7,0.1);
+    color: #ffc107;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 700;
+    border: 1px solid rgba(255,193,7,0.2);
+  }
+
+  /* ===== CHARTS & DATA VIZ ===== */
+  .chart-container {
+    width: 100%;
+    max-width: 1100px;
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-top: 20px;
+  }
+
+  .chart-box {
+    background: var(--dark);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    flex: 1;
+    min-width: 320px;
+    position: relative;
+  }
+  .chart-box-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* BAR CHART */
+  .bar-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .bar-label {
+    width: 100px;
+    font-size: 12px;
+    color: var(--gray-light);
+    text-align: left;
+    flex-shrink: 0;
+    font-weight: 600;
+  }
+  .bar-track {
+    flex: 1;
+    height: 28px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-right: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--white);
+    width: 0;
+  }
+  .bar-fill.animated { /* width set via JS */ }
+
+  /* RADAR / STAT GRID */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .stat-item {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .stat-value {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--red);
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 12px;
+    color: var(--gray-light);
+    margin-top: 6px;
+    font-weight: 500;
+  }
+
+  /* ===== PRICING TABLE ===== */
+  .pricing-table-wrap {
+    width: 100%;
+    max-width: 1100px;
+    overflow-x: auto;
+    margin-top: 16px;
+  }
+  .pricing-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 13px;
+  }
+  .pricing-table thead th {
+    background: var(--dark);
+    color: var(--white);
+    padding: 14px 16px;
+    font-weight: 700;
+    text-align: center;
+    border-bottom: 2px solid var(--red);
+    position: sticky;
+    top: 0;
+  }
+  .pricing-table thead th:first-child { text-align: right; border-radius: 0 10px 0 0; }
+  .pricing-table thead th:last-child { border-radius: 10px 0 0 0; }
+  .pricing-table tbody td {
+    padding: 12px 16px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    color: var(--gray-light);
+  }
+  .pricing-table tbody td:first-child {
+    text-align: right;
+    color: var(--white);
+    font-weight: 600;
+  }
+  .pricing-table tbody tr:hover td {
+    background: rgba(230,57,70,0.04);
+  }
+
+  /* ===== SWOT ===== */
+  .swot-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+    max-width: 1000px;
+    margin-top: 16px;
+  }
+  .swot-cell {
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .swot-cell::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 4px; height: 100%;
+  }
+  .swot-cell.s { background: rgba(16,185,129,0.04); }
+  .swot-cell.s::before { background: #10b981; }
+  .swot-cell.w { background: rgba(239,68,68,0.04); }
+  .swot-cell.w::before { background: #ef4444; }
+  .swot-cell.o { background: rgba(59,130,246,0.04); }
+  .swot-cell.o::before { background: #3b82f6; }
+  .swot-cell.t { background: rgba(245,158,11,0.04); }
+  .swot-cell.t::before { background: #f59e0b; }
+
+  .swot-title {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .swot-cell.s .swot-title { color: #10b981; }
+  .swot-cell.w .swot-title { color: #ef4444; }
+  .swot-cell.o .swot-title { color: #3b82f6; }
+  .swot-cell.t .swot-title { color: #f59e0b; }
+
+  .swot-cell ul {
+    list-style: none;
+    padding: 0;
+  }
+  .swot-cell li {
+    font-size: 13px;
+    color: var(--gray-light);
+    padding: 5px 0;
+    line-height: 1.7;
+    position: relative;
+    padding-right: 18px;
+  }
+  .swot-cell li::before {
+    content: '▸';
+    position: absolute;
+    right: 0;
+    font-size: 12px;
+  }
+  .swot-cell.s li::before { color: #10b981; }
+  .swot-cell.w li::before { color: #ef4444; }
+  .swot-cell.o li::before { color: #3b82f6; }
+  .swot-cell.t li::before { color: #f59e0b; }
+
+  /* ===== MAP SLIDE ===== */
+  .map-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    width: 100%;
+    max-width: 1100px;
+    margin-top: 16px;
+  }
+  .map-card {
+    background: var(--dark);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .map-card:hover {
+    border-color: var(--red);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(230,57,70,0.1);
+  }
+  .map-card-mall {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--red);
+    margin-bottom: 6px;
+  }
+  .map-card-salon {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+  .map-card-address {
+    font-size: 12px;
+    color: var(--gray-light);
+    line-height: 1.6;
+  }
+  .map-card-tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 8px;
+    background: rgba(230,57,70,0.1);
+    color: var(--red);
+    border: 1px solid rgba(230,57,70,0.2);
+  }
+
+  /* ===== RECOMMENDATIONS ===== */
+  .reco-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 100%;
+    max-width: 1000px;
+    margin-top: 20px;
+  }
+  .reco-card {
+    background: var(--dark);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+  .reco-card:hover {
+    border-color: var(--red);
+    transform: translateY(-2px);
+  }
+  .reco-card::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--red), transparent);
+  }
+  .reco-number {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(230,57,70,0.1);
+    color: var(--red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 800;
+  }
+  .reco-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+  .reco-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+  .reco-desc {
+    font-size: 13px;
+    color: var(--gray-light);
+    line-height: 1.7;
+  }
+
+  /* ===== ADDITIONAL COMPETITORS ===== */
+  .add-comp-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    width: 100%;
+    max-width: 1100px;
+    margin-top: 16px;
+  }
+  .add-comp-card {
+    background: var(--dark);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    transition: all 0.3s;
+  }
+  .add-comp-card:hover {
+    border-color: rgba(230,57,70,0.4);
+  }
+  .add-comp-icon {
+    width: 48px; height: 48px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(230,57,70,0.15), rgba(230,57,70,0.05));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .add-comp-info { flex: 1; }
+  .add-comp-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+  .add-comp-loc {
+    font-size: 12px;
+    color: var(--red);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .add-comp-desc {
+    font-size: 12px;
+    color: var(--gray-light);
+    line-height: 1.6;
+  }
+
+  /* ===== END SLIDE ===== */
+  .end-slide {
+    text-align: center;
+  }
+  .end-tagline {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+  .end-tagline span { color: var(--red); }
+  .end-contact {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    margin-top: 30px;
+    flex-wrap: wrap;
+  }
+  .end-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--gray-light);
+    font-size: 14px;
+  }
+  .end-contact-item .cicon { color: var(--red); font-size: 18px; }
+
+  /* ===== CANVAS ===== */
+  canvas#radarChart, canvas#pieChart {
+    max-width: 100%;
+    max-height: 280px;
+  }
+
+  /* ===== TIER VISUAL ===== */
+  .tier-visual {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    max-width: 1100px;
+    margin-top: 16px;
+    justify-content: center;
+  }
+  .tier-col {
+    flex: 1;
+    border-radius: 14px;
+    padding: 24px;
+    text-align: center;
+    border: 1px solid var(--border);
+    background: var(--dark);
+    position: relative;
+    overflow: hidden;
+  }
+  .tier-col::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; left: 0;
+    height: 3px;
+  }
+  .tier-col.t1::before { background: linear-gradient(90deg, #ffd700, #ff8c00); }
+  .tier-col.t2::before { background: linear-gradient(90deg, #c0c0c0, #a0a0a0); }
+  .tier-col.t3::before { background: linear-gradient(90deg, #cd7f32, #a0522d); }
+  .tier-badge {
+    display: inline-block;
+    padding: 4px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .tier-col.t1 .tier-badge { background: rgba(255,215,0,0.15); color: #ffd700; }
+  .tier-col.t2 .tier-badge { background: rgba(192,192,192,0.15); color: #c0c0c0; }
+  .tier-col.t3 .tier-badge { background: rgba(205,127,50,0.15); color: #cd7f32; }
+  .tier-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+  .tier-examples {
+    font-size: 12px;
+    color: var(--gray-light);
+    line-height: 1.7;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 900px) {
+    .slide { padding: 20px 30px; }
+    .cover-title { font-size: 32px; }
+    .competitor-slide { flex-direction: column; }
+    .comp-sidebar { width: 100%; }
+    .swot-grid, .reco-grid, .add-comp-grid { grid-template-columns: 1fr; }
+    .map-grid { grid-template-columns: 1fr 1fr; }
+    .tier-visual { flex-direction: column; }
+    .chart-container { flex-direction: column; }
+  }
+
+  /* ===== KEYBOARD HINT ===== */
+  .keyboard-hint {
+    position: fixed;
+    bottom: 85px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: var(--gray);
+    z-index: 100;
+    opacity: 0.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="presentation" id="presentation">
+
+  <!-- ===== SLIDE 0: COVER ===== -->
+  <div class="slide active" data-slide="0">
+    <div class="floating-shapes">
+      <div class="shape"></div>
+      <div class="shape"></div>
+      <div class="shape"></div>
+    </div>
+    <div class="corner-decoration top-right"></div>
+    <div class="corner-decoration bottom-left"></div>
+
+    <img src="sun_media_logo.png" alt="Sun Media Logo" class="cover-logo">
+    <div class="cover-subtitle">Sun Media Advertising Agency</div>
+    <div class="cover-title">دراسة تحليلية للمنافسين</div>
+    <div class="red-accent-line"></div>
+    <div class="cover-description">
+      تحليل شامل لأبرز صالونات العناية بالأظافر في منطقة التجمع الخامس والقاهرة الجديدة
+      <br>— الميزات التنافسية، نقاط القوة والضعف، والفرص السوقية
+    </div>
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <span class="icon">📍</span>
+        التجمع الخامس - القاهرة الجديدة
+      </div>
+      <div class="cover-meta-item">
+        <span class="icon">📊</span>
+        ٧+ صالونات تحت الدراسة
+      </div>
+      <div class="cover-meta-item">
+        <span class="icon">📅</span>
+        أكتوبر ٢٠٢٦
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 1: MARKET OVERVIEW ===== -->
+  <div class="slide" data-slide="1">
+    <div class="floating-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
+    <div class="corner-decoration top-right"></div>
+
+    <div class="section-header" style="margin-bottom: 24px;">
+      <div class="section-number">01</div>
+      <div class="section-title">نظرة عامة على السوق</div>
+      <div class="red-accent-line"></div>
+      <div class="section-subtitle">سوق العناية بالأظافر في القاهرة الجديدة يمثل أحد أسرع القطاعات نمواً في صناعة التجميل</div>
+    </div>
+
+    <div class="chart-container">
+      <div class="chart-box">
+        <div class="chart-box-title">
+          <span style="color:var(--red)">📊</span>
+          إحصائيات السوق
+        </div>
+        <div class="stat-grid">
+          <div class="stat-item">
+            <div class="stat-value">٧+</div>
+            <div class="stat-label">صالون متخصص في التجمع</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">٨٤٣+</div>
+            <div class="stat-label">إجمالي التقييمات</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">4.7</div>
+            <div class="stat-label">متوسط التقييم العام</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">٥</div>
+            <div class="stat-label">مولات رئيسية</div>
+          </div>
+        </div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-box-title">
+          <span style="color:var(--red)">🏷️</span>
+          شرائح السوق التنافسية
+        </div>
+        <div class="tier-visual" style="flex-direction: column; gap: 10px; margin-top: 0;">
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,215,0,0.04);border:1px solid rgba(255,215,0,0.15);border-radius:10px;">
+            <span style="background:rgba(255,215,0,0.15);color:#ffd700;padding:4px 12px;border-radius:16px;font-size:12px;font-weight:700;">الفئة ١</span>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--white);">بوتيكات الأظافر المتخصصة</div>
+              <div style="font-size:12px;color:var(--gray-light);">Veloura, Nail Room, Lush, Nail Lounge</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(192,192,192,0.04);border:1px solid rgba(192,192,192,0.15);border-radius:10px;">
+            <span style="background:rgba(192,192,192,0.15);color:#c0c0c0;padding:4px 12px;border-radius:16px;font-size:12px;font-weight:700;">الفئة ٢</span>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--white);">صالونات التجميل متعددة الخدمات</div>
+              <div style="font-size:12px;color:var(--gray-light);">Nailash, L.A Nails, Aura Nails</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(205,127,50,0.04);border:1px solid rgba(205,127,50,0.15);border-radius:10px;">
+            <span style="background:rgba(205,127,50,0.15);color:#cd7f32;padding:4px 12px;border-radius:16px;font-size:12px;font-weight:700;">الفئة ٣</span>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--white);">الخدمات المنزلية والمتنقلة</div>
+              <div style="font-size:12px;color:var(--gray-light);">خدمات التوصيل المنزلي وصالونات الموبايل</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 2: COMPETITOR 1 - VELOURA ===== -->
+  <div class="slide" data-slide="2">
+    <div class="floating-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
+    <div class="competitor-slide">
+      <div class="comp-main">
+        <div class="comp-header">
+          <div class="comp-rank">١</div>
+          <div>
+            <div class="comp-name">صالون فيلورا</div>
+            <div class="comp-name-en">Veloura Nail Salon & Spa</div>
+          </div>
+          <div class="rating-badge">⭐ 4.8 <span style="color:var(--gray-light);font-size:11px;">(١٠٥ تقييم)</span></div>
+        </div>
+
+        <div class="comp-location">
+          <span>📍</span>
+          فيتالي مول (Vitali Mall) - بجوار الجامعة الأمريكية - شارع AUC
+        </div>
+
+        <div class="comp-features">
+          يركز على التقنيات الحديثة لبناء وتمديد الأظافر مثل الـ <strong style="color:var(--white)">BIAB</strong>، والـ <strong style="color:var(--white)">Hard Gel</strong>، والأكريليك. يقدم رسم أظافر مبتكر (3D والمينيماليست) في بيئة هادئة أشبه بالسبا مع بروتوكولات تعقيم بمستوى طبي.
+        </div>
+      </div>
+
+      <div class="comp-sidebar">
+        <div class="comp-card strengths">
+          <div class="comp-card-title">✅ نقاط القوة</div>
+          <ul>
+            <li>خبرة متخصصة في رسومات الأظافر المعقدة وتطبيقات BIAB</li>
+            <li>تقييمات مرتفعة جداً (4.8+) بفضل نظافة المكان والتفاصيل الدقيقة</li>
+            <li>موقع استراتيجي يستهدف طلاب الجامعة الأمريكية والمجمعات الراقية</li>
+            <li>بيئة هادئة وخصوصية عالية</li>
+          </ul>
+        </div>
+        <div class="comp-card weaknesses">
+          <div class="comp-card-title">⚠️ نقاط الضعف</div>
+          <ul>
+            <li>قدرة استيعابية محدودة - حجز مسبق صارم فقط</li>
+            <li>أسعار في الفئة العليا من السوق</li>
+            <li>تنوع محدود - تركيز على الأظافر فقط دون خدمات تجميل متكاملة</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 3: COMPETITOR 2 - NAILASH ===== -->
+  <div class="slide" data-slide="3">
+    <div class="floating-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
+    <div class="competitor-slide">
+      <div class="comp-main">
+        <div class="comp-header">
+          <div class="comp-rank">٢</div>
+          <div>
+            <div class="comp-name">نيل آند لاش</div>
+            <div class="comp-name-en">Nailash Beauty Lounge</div>
+          </div>
+          <div class="rating-badge">⭐ 4.6 <span style="color:var(--gray-light);font-size:11px;">(١١٤ تقييم)</span></div>
+        </div>
+
+        <div class="comp-location">
+          <span>📍</span>
+          دي 90 مول (D90 Mall) - شارع التسعين الشمالي - التجمع الخامس
+        </div>
+
+        <div class="comp-features">
+          يجمع بين خدمات المانيكير والباديكير الاحترافية وخدمات تركيب الرموش المتخصصة باستخدام <strong style="color:var(--white)">تقنيات لبنانية</strong> وعلاجات العناية بالبشرة. يتميز بتقسيم داخلي منظم يفصل بين مناطق الخدمات المختلفة.
+        </div>
+      </div>
+
+      <div class="comp-sidebar">
+        <div class="comp-card strengths">
+          <div class="comp-card-title">✅ نقاط القوة</div>
+          <ul>
+            <li>تكامل الخدمات - دمج الرموش والبشرة والأظافر في زيارة واحدة</li>
+            <li>موقع ممتاز على المحور التجاري الرئيسي (التسعين الشمالي)</li>
+            <li>حضور رقمي قوي يجذب الشابات والمحترفات</li>
+            <li>أعلى معايير النظافة والتعقيم العالمية</li>
+          </ul>
+        </div>
+        <div class="comp-card weaknesses">
+          <div class="comp-card-title">⚠️ نقاط الضعف</div>
+          <ul>
+            <li>ازدحام شديد في أوقات الذروة وعطلات نهاية الأسبوع</li>
+            <li>إطالة مدة الزيارة بسبب تعدد مسارات الخدمات</li>
+            <li>صعوبة في تنسيق الحجوزات خلال الفترات المزدحمة</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 4: COMPETITOR 3 - L.A NAILS ===== -->
+  <div class="slide" data-slide="4">
+    <div class="floating-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
+    <div class="competitor-slide">
+      <div class="comp-main">
+        <div class="comp-header">
+          <div class="comp-rank">٣</div>
+          <div>
+            <div class="comp-name">إل إيه نيلز</div>
+            <div class="comp-name-en">L.A Nails Egypt</div>
+          </div>
+          <div class="rating-badge">⭐ 4.8 <span style="color:var(--gray-light);font-size:11px;">(٦٣ تقييم)</span></div>
+        </div>
+
+        <div class="comp-location">
+          <span>📍</span>
+          ماكسيم مول (Maxim Mall) - التسعين الشمالي + فرع محور ٧٩
+        </div>
+
+        <div class="comp-features">
+          علامة تجارية عريقة بتواجد متعدد الفروع. تقدم خدمات الـ <strong style="color:var(--white)">Hard Gel</strong> والأكريليك والمانيكير الفرنسي الكلاسيكي و<strong style="color:var(--white)">Lash Lifts</strong>، بالإضافة إلى خدمة الصالون المتنقل <strong style="color:var(--white)">(Nails on Wheels)</strong>.
+        </div>
+      </div>
+
+      <div class="comp-sidebar">
+        <div class="comp-card strengths">
+          <div class="comp-card-title">✅ نقاط القوة</div>
+          <ul>
+            <li>انتشار واسع وثقة عالية بالعلامة التجارية في القاهرة الكبرى</li>
+            <li>مرونة عالية - فروع متعددة + صالون متنقل</li>
+            <li>سرعة تنفيذ ممتازة في خدمات الصيانة الدورية</li>
+            <li>جودة خامات مرتفعة واحترافية الفنيين</li>
+          </ul>
+        </div>
+        <div class="comp-card weaknesses">
+          <div class="comp-card-title">⚠️ نقاط الضعف</div>
+          <ul>
+            <li>تفاوت في جودة اللمسات النهائية بين الفنيين والفروع</li>
+            <li>أجواء المولات المزدحمة في أوقات الذروة</li>
+            <li>محدودية الخصوصية في بعض الفروع</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 5: COMPETITOR 4 - LUSH ===== -->
+  <div class="slide" data-slide="5">
+    <div class="floating-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
+    <div class="competitor-slide">
+      <div class="comp-main">
+        <div class="comp-header">
+          <div class="comp-rank">٤</div>
+          <div>
+            <div class="comp-name">صالون لوش</div>
+            <div class="comp-name-en">Lush Nail Salon & Spa</div>
+          </div>
+          <div class="rating-badge">⭐ 4.7 <span style="color:var(--gray-light);font-size:11px;">(٤٨٩ تقييم)</span></div>
+        </div>
+
+        <div class="comp-location">
+          <span>📍</span>
+          ميدتاون مول (Midtown Mall) - أمام الجامعة الأمريكية مباشرة
+        </div>
+
+        <div class="comp-features">
+          تجربة <strong style="color:var(--white)">VIP سبا فاخرة</strong> متكاملة تتضمن كراسي الباديكير المزودة بخاصية المساج، علاجات البارافين، طبقات الجل المقوية، وباقات علاجية مخصصة لليدين والقدمين. الأكثر تقييماً (٤٨٩ مراجعة).
+        </div>
+      </div>
+
+      <div class="comp-sidebar">
+        <div class="comp-card strengths">
+          <div class="comp-card-title">✅ نقاط القوة</div>
+          <ul>
+            <li>تجربة استرخاء مميزة مصممة للراحة والاستجمام</li>
+            <li>علاجات متطورة: إزالة الكالوس، مساج القدمين، أقنعة ترطيب</li>
+            <li>أكبر قاعدة تقييمات بين المنافسين (٤٨٩ مراجعة)</li>
+            <li>استقطاب مباشر من حركة المشاة في ميدتاون مول</li>
+          </ul>
+        </div>
+        <div class="comp-card weaknesses">
+          <div class="comp-card-title">⚠️ نقاط الضعف</div>
+          <ul>
+            <li>وقت خدمة أطول يقلل معدل دوران العميلات اليومي</li>
+            <li>تركيز أقل على التريندات والرسومات الجرافيكية المعقدة</li>
+            <li>أسعار مرتفعة نسبياً للباقات العلاجية</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 6: COMPETITOR 5 - NAIL LOUNGE ===== -->
+  <div class="slide" data-slide="6">
+    <div class="floating-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
+    <div class="competitor-slide">
+      <div class="comp-main">
+        <div class="comp-header">
+          <div class="comp-rank">٥</div>
+          <div>
+            <div class="comp-name">نيل لاونج</div>
+            <div class="comp-name-en">Nail Lounge</div>
+          </div>
+          <div class="rating-badge">⭐ 4.7 <span style="color:var(--gray-light);font-size:11px;">(٧٢ تقييم)</span></div>
+        </div>
+
+        <div class="comp-location">
+          <span>📍</span>
+          ميدتاون مول (Midtown Mall) - مع فروع أخرى في مناطق تسوق راقية بالقاهرة
+        </div>
+
+        <div class="comp-features">
+          محطات عمل مصممة للسرعة والكفاءة. متخصص في تركيبات <strong style="color:var(--white)">الأكريليك السريعة</strong>، طبقات الجل، وتوفير أحدث لوحات الألوان العصرية مع تأثيرات <strong style="color:var(--white)">Chrome Glazes</strong> واللمسات البسيطة الراقية.
+        </div>
+      </div>
+
+      <div class="comp-sidebar">
+        <div class="comp-card strengths">
+          <div class="comp-card-title">✅ نقاط القوة</div>
+          <ul>
+            <li>سرعة تشغيلية عالية - فترات حجز قصيرة وسريعة</li>
+            <li>مواكبة فورية لصيحات الموسم والتريندات</li>
+            <li>موقع مالي ممتاز يتيح الدمج مع التسوق والترفيه</li>
+            <li>شعبية كبيرة واحترافية فريق العمل</li>
+          </ul>
+        </div>
+        <div class="comp-card weaknesses">
+          <div class="comp-card-title">⚠️ نقاط الضعف</div>
+          <ul>
+            <li>منافسة محلية مباشرة من صالون لوش في نفس المول</li>
+            <li>تكدس وازدحام في الساعات الأكثر إقبالاً</li>
+            <li>افتقار نسبي للخصوصية والهدوء في أوقات الذروة</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 7: ADDITIONAL COMPETITORS ===== -->
+  <div class="slide" data-slide="7">
+    <div class="floating-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
+    <div class="corner-decoration top-right"></div>
+
+    <div class="section-header" style="margin-bottom: 20px;">
+      <div class="section-number">06</div>
+      <div class="section-title">منافسون إضافيون</div>
+      <div class="red-accent-line"></div>
+      <div class="section-subtitle">صالونات أخرى بارزة تنافس في سوق التجمع الخامس</div>
+    </div>
+
+    <div class="add-comp-grid">
+      <div class="add-comp-card">
+        <div class="add-comp-icon">💅</div>
+        <div class="add-comp-info">
+          <div class="add-comp-name">Nail Room Lounge</div>
+          <div class="add-comp-loc">📍 القاهرة الجديدة + فروع (المعادي، الساحل)</div>
+          <div class="add-comp-desc">من أشهر العلامات في مصر. خدمات احترافية للجل والأكريليك ورسم الأظافر بتصاميم عصرية وأنيقة. حضور قوي على إنستجرام وقاعدة عملاء واسعة.</div>
+        </div>
+      </div>
+      <div class="add-comp-card">
+        <div class="add-comp-icon">✨</div>
+        <div class="add-comp-info">
+          <div class="add-comp-name">Aura Nails Studio</div>
+          <div class="add-comp-loc">📍 مول A340 - شارع التسعين الجنوبي</div>
+          <div class="add-comp-desc">استوديو متخصص يقدم أحدث صيحات الأظافر والرموش والعناية الشخصية. مفضل لدى شريحة واسعة من السيدات في منطقة التسعين الجنوبي.</div>
+        </div>
+      </div>
+      <div class="add-comp-card">
+        <div class="add-comp-icon">💎</div>
+        <div class="add-comp-info">
+          <div class="add-comp-name">Nail Fashion</div>
+          <div class="add-comp-loc">📍 قطامية داون تاون مول - شارع التسعين</div>
+          <div class="add-comp-desc">يقع في أحد أشهر مولات التجمع. يقدم خدمات تجميلية وعناية بالأظافر بمستوى مرتفع مع موقع حيوي يسهل الوصول إليه.</div>
+        </div>
+      </div>
+      <div class="add-comp-card">
+        <div class="add-comp-icon">🌟</div>
+        <div class="add-comp-info">
+          <div class="add-comp-name">نور نيلز سنتر (Nour Nails)</div>
+          <div class="add-comp-loc">📍 خلف كونكورد بلازا - بجوار نادي الزهور</div>
+          <div class="add-comp-desc">تحت إشراف خبيرة من أكاديمية ماجنتيك في هولندا. مركز متخصص في أظافر الجل والأكريليك مع خبرة دولية معتمدة.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 8: RATINGS & REVIEWS COMPARISON ===== -->
+  <div class="slide" data-slide="8">
+    <div class="floating-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
+    <div class="corner-decoration top-right"></div>
+
+    <div class="section-header" style="margin-bottom: 20px;">
+      <div class="section-number">07</div>
+      <div class="section-title">مقارنة التقييمات والمراجعات</div>
+      <div class="red-accent-line"></div>
+    </div>
+
+    <div class="chart-container">
+      <div class="chart-box" style="flex:1.2;">
+        <div class="chart-box-title">
+          <span style="color:var(--red)">⭐</span>
+          التقييم من ٥ نجوم
+        </div>
+        <div class="bar-chart" id="ratingChart">
+          <div class="bar-row">
+            <div class="bar-label">Veloura</div>
+            <div class="bar-track"><div class="bar-fill" data-width="96" style="background: linear-gradient(90deg, var(--red), var(--red-light));">4.8</div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label">L.A Nails</div>
+            <div class="bar-track"><div class="bar-fill" data-width="96" style="background: linear-gradient(90deg, var(--red), var(--red-light));">4.8</div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label">Lush</div>
+            <div class="bar-track"><div class="bar-fill" data-width="94" style="background: linear-gradient(90deg, #f59e0b, #fbbf24);">4.7</div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label">Nail Lounge</div>
+            <div class="bar-track"><div class="bar-fill" data-width="94" style="background: linear-gradient(90deg, #f59e0b, #fbbf24);">4.7</div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label">Nailash</div>
+            <div class="bar-track"><div class="bar-fill" data-width="92" style="background: linear-gradient(90deg, #10b981, #34d399);">4.6</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-box" style="flex:1.2;">
+        <div class="chart-box-title">
+          <span style="color:var(--red)">💬</span>
+          عدد المراجعات
+        </div>
+        <div class="bar-chart" id="reviewsChart">
+          <div class="bar-row">
+            <div class="bar-label">Lush</div>
+            <div class="bar-track"><div class="bar-fill" data-width="100" style="background: linear-gradient(90deg, var(--red), var(--red-light));">٤٨٩</div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label">Nailash</div>
+            <div class="bar-track"><div class="bar-fill" data-width="23" style="background: linear-gradient(90deg, #f59e0b, #fbbf24);">١١٤</div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label">Veloura</div>
+            <div class="bar-track"><div class="bar-fill" data-width="21" style="background: linear-gradient(90deg, #10b981, #34d399);">١٠٥</div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label">Nail Lounge</div>
+            <div class="bar-track"><div class="bar-fill" data-width="15" style="background: linear-gradient(90deg, #3b82f6, #60a5fa);">٧٢</div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label">L.A Nails</div>
+            <div class="bar-track"><div class="bar-fill" data-width="13" style="background: linear-gradient(90deg, #8b5cf6, #a78bfa);">٦٣</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 9: PRICING COMPARISON ===== -->
+  <div class="slide" data-slide="9">
+    <div class="floating-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
+    <div class="corner-decoration top-right"></div>
+
+    <div class="section-header" style="margin-bottom: 16px;">
+      <div class="section-number">08</div>
+      <div class="section-title">مقارنة الأسعار التقديرية</div>
+      <div class="red-accent-line"></div>
+      <div class="section-subtitle">متوسط الأسعار في سوق القاهرة الجديدة (بالجنيه المصري)</div>
+    </div>
+
+    <div class="pricing-table-wrap">
+      <table class="pricing-table">
+        <thead>
+          <tr>
+            <th>الخدمة</th>
+            <th>النطاق السعري</th>
+            <th>الفئة المستهدفة</th>
+            <th>ملاحظات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>مانيكير كلاسيكي</td>
+            <td>٢٥٠ - ٤٠٠ ج.م</td>
+            <td>الجميع</td>
+            <td>الخدمة الأساسية الأكثر طلباً</td>
+          </tr>
+          <tr>
+            <td>باديكير كلاسيكي</td>
+            <td>٢٦٠ - ٤٥٠ ج.م</td>
+            <td>الجميع</td>
+            <td>يشمل العناية بالقدمين الأساسية</td>
+          </tr>
+          <tr>
+            <td style="color:var(--red);font-weight:700;">جل مانيكير</td>
+            <td>٦٠٠ - ٨٠٠ ج.م</td>
+            <td>الفئة المتوسطة-العليا</td>
+            <td>الأعلى طلباً في فئة التمديد</td>
+          </tr>
+          <tr>
+            <td style="color:var(--red);font-weight:700;">جل باديكير</td>
+            <td>٦٠٠ - ٨٥٠ ج.م</td>
+            <td>الفئة المتوسطة-العليا</td>
+            <td>يشمل طبقات الحماية</td>
+          </tr>
+          <tr>
+            <td>كومبو (مانيكير + باديكير جل)</td>
+            <td>١,٥٠٠ - ١,٨٠٠ ج.م</td>
+            <td>الفئة العليا</td>
+            <td>أعلى متوسط إيرادات للجلسة</td>
+          </tr>
+          <tr>
+            <td style="color:var(--red);font-weight:700;">تركيب أكريليك/جل جديد</td>
+            <td>١,٠٠٠ - ١,٣٠٠+ ج.م</td>
+            <td>الفئة العليا</td>
+            <td>أعلى هامش ربح</td>
+          </tr>
+          <tr>
+            <td>ريفيل (Refill)</td>
+            <td>٦٥٠ - ٨٠٠ ج.م</td>
+            <td>العميلات الدائمات</td>
+            <td>خدمة متكررة عالية الولاء</td>
+          </tr>
+          <tr>
+            <td>إزالة التركيبات</td>
+            <td>١٥٠ - ٣٠٠ ج.م</td>
+            <td>الجميع</td>
+            <td>خدمة مساندة</td>
+          </tr>
+          <tr>
+            <td>نيل آرت / كروم / هولوجرافيك</td>
+            <td>+١٠٠ - ٢٥٠ ج.م</td>
+            <td>الشابات</td>
+            <td>إضافة على الخدمات الأساسية</td>
+          </tr>
+          <tr>
+            <td>علاج بارافين</td>
+            <td>٢٠٠ - ٣٥٠ ج.م</td>
+            <td>الباحثات عن الرفاهية</td>
+            <td>متوفر بشكل رئيسي في Lush</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 10: LOCATION MAP ===== -->
+  <div class="slide" data-slide="10">
+    <div class="floating-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
+    <div class="corner-decoration top-right"></div>
+
+    <div class="section-header" style="margin-bottom: 16px;">
+      <div class="section-number">09</div>
+      <div class="section-title">خريطة التوزيع الجغرافي</div>
+      <div class="red-accent-line"></div>
+      <div class="section-subtitle">تتركز أغلب الصالونات حول المحورين التجاريين الرئيسيين: شارع التسعين الشمالي ومنطقة ميدتاون</div>
+    </div>
+
+    <div class="map-grid">
+      <div class="map-card">
+        <div class="map-card-mall">فيتالي مول</div>
+        <div class="map-card-salon">Veloura</div>
+        <div class="map-card-address">بجوار الجامعة الأمريكية - شارع AUC</div>
+        <div class="map-card-tag">بوتيك متخصص</div>
+      </div>
+      <div class="map-card">
+        <div class="map-card-mall">دي 90 مول (D90)</div>
+        <div class="map-card-salon">Nailash</div>
+        <div class="map-card-address">شارع التسعين الشمالي</div>
+        <div class="map-card-tag">متعدد الخدمات</div>
+      </div>
+      <div class="map-card">
+        <div class="map-card-mall">ماكسيم مول + محور ٧٩</div>
+        <div class="map-card-salon">L.A Nails</div>
+        <div class="map-card-address">التسعين الشمالي + الحي الأول</div>
+        <div class="map-card-tag">متعدد الفروع</div>
+      </div>
+      <div class="map-card">
+        <div class="map-card-mall">ميدتاون مول</div>
+        <div class="map-card-salon">Lush Nail Spa</div>
+        <div class="map-card-address">أمام الجامعة الأمريكية مباشرة</div>
+        <div class="map-card-tag">سبا فاخر</div>
+      </div>
+      <div class="map-card">
+        <div class="map-card-mall">ميدتاون مول</div>
+        <div class="map-card-salon">Nail Lounge</div>
+        <div class="map-card-address">أمام الجامعة الأمريكية</div>
+        <div class="map-card-tag">خدمة سريعة</div>
+      </div>
+      <div class="map-card">
+        <div class="map-card-mall">مول A340</div>
+        <div class="map-card-salon">Aura Nails Studio</div>
+        <div class="map-card-address">شارع التسعين الجنوبي</div>
+        <div class="map-card-tag">استوديو متخصص</div>
+      </div>
+      <div class="map-card">
+        <div class="map-card-mall">قطامية داون تاون</div>
+        <div class="map-card-salon">Nail Fashion</div>
+        <div class="map-card-address">شارع التسعين - قطامية</div>
+        <div class="map-card-tag">مول حيوي</div>
+      </div>
+      <div class="map-card">
+        <div class="map-card-mall">خلف كونكورد بلازا</div>
+        <div class="map-card-salon">Nour Nails Center</div>
+        <div class="map-card-address">المستثمرين الجنوبية - بجوار نادي الزهور</div>
+        <div class="map-card-tag">خبرة دولية</div>
+      </div>
+      <div class="map-card">
+        <div class="map-card-mall">فروع متعددة</div>
+        <div class="map-card-salon">Nail Room Lounge</div>
+        <div class="map-card-address">القاهرة الجديدة + المعادي + الساحل</div>
+        <div class="map-card-tag">علامة وطنية</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 11: SWOT ===== -->
+  <div class="slide" data-slide="11">
+    <div class="floating-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
+    <div class="corner-decoration top-right"></div>
+
+    <div class="section-header" style="margin-bottom: 16px;">
+      <div class="section-number">10</div>
+      <div class="section-title">تحليل SWOT للسوق</div>
+      <div class="red-accent-line"></div>
+      <div class="section-subtitle">تحليل الفرص والتهديدات ونقاط القوة والضعف في سوق التجمع</div>
+    </div>
+
+    <div class="swot-grid">
+      <div class="swot-cell s">
+        <div class="swot-title">💪 نقاط القوة (Strengths)</div>
+        <ul>
+          <li>تركز عالٍ على الجودة والنظافة بين جميع المنافسين</li>
+          <li>تواجد في مولات حيوية قريبة من الجامعة الأمريكية</li>
+          <li>تنوع في نماذج الخدمة (سبا، سريع، متعدد)</li>
+          <li>قاعدة عملاء مثقفة وذات قدرة شرائية عالية</li>
+        </ul>
+      </div>
+      <div class="swot-cell w">
+        <div class="swot-title">⚡ نقاط الضعف (Weaknesses)</div>
+        <ul>
+          <li>اعتماد أغلب الصالونات على الحجز المسبق فقط</li>
+          <li>ارتفاع الأسعار مقارنة بمناطق أخرى في القاهرة</li>
+          <li>تفاوت جودة الفنيين بين الفروع والصالونات</li>
+          <li>ازدحام في أوقات الذروة وعطلات نهاية الأسبوع</li>
+        </ul>
+      </div>
+      <div class="swot-cell o">
+        <div class="swot-title">🚀 الفرص (Opportunities)</div>
+        <ul>
+          <li>غياب صالونات توفر أقساماً مخصصة للمحجبات</li>
+          <li>فرصة لتقديم باقات اشتراك شهرية (Membership)</li>
+          <li>نظام حجز ذكي عبر التطبيقات بدلاً من الرسائل</li>
+          <li>التوسع في مناطق جديدة (الرحاب، مدينتي)</li>
+          <li>خدمة الصالون المتنقل لم تُستغل بشكل كافٍ</li>
+        </ul>
+      </div>
+      <div class="swot-cell t">
+        <div class="swot-title">🔥 التهديدات (Threats)</div>
+        <ul>
+          <li>دخول منافسين جدد باستمرار إلى السوق</li>
+          <li>ارتفاع أسعار المواد الخام المستوردة</li>
+          <li>نمو سريع لخدمات الأظافر المنزلية</li>
+          <li>تقلبات اقتصادية تؤثر على القدرة الشرائية</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 12: SERVICE COMPARISON MATRIX ===== -->
+  <div class="slide" data-slide="12">
+    <div class="floating-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
+    <div class="corner-decoration top-right"></div>
+
+    <div class="section-header" style="margin-bottom: 16px;">
+      <div class="section-number">11</div>
+      <div class="section-title">مصفوفة الخدمات التنافسية</div>
+      <div class="red-accent-line"></div>
+    </div>
+
+    <div class="pricing-table-wrap">
+      <table class="pricing-table">
+        <thead>
+          <tr>
+            <th>الخدمة</th>
+            <th>Veloura</th>
+            <th>Nailash</th>
+            <th>L.A Nails</th>
+            <th>Lush</th>
+            <th>Nail Lounge</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Hard Gel</td>
+            <td style="color:#10b981;">✅</td>
+            <td style="color:#10b981;">✅</td>
+            <td style="color:#10b981;">✅</td>
+            <td style="color:#10b981;">✅</td>
+            <td style="color:#10b981;">✅</td>
+          </tr>
+          <tr>
+            <td>أكريليك</td>
+            <td style="color:#10b981;">✅</td>
+            <td style="color:#10b981;">✅</td>
+            <td style="color:#10b981;">✅</td>
+            <td style="color:var(--gray);">◻️</td>
+            <td style="color:#10b981;">✅</td>
+          </tr>
+          <tr>
+            <td>BIAB</td>
+            <td style="color:#10b981;">✅</td>
+            <td style="color:var(--gray);">◻️</td>
+            <td style="color:var(--gray);">◻️</td>
+            <td style="color:var(--gray);">◻️</td>
+            <td style="color:var(--gray);">◻️</td>
+          </tr>
+          <tr>
+            <td>Nail Art متقدم</td>
+            <td style="color:#10b981;">✅</td>
+            <td style="color:#10b981;">✅</td>
+            <td style="color:#10b981;">✅</td>
+            <td style="color:var(--gray);">◻️</td>
+            <td style="color:#10b981;">✅</td>
+          </tr>
+          <tr>
+            <td>باديكير علاجي / سبا</td>
+            <td style="color:var(--gray);">◻️</td>
+            <td style="color:var(--gray);">◻️</td>
+            <td style="color:var(--gray);">◻️</td>
+            <td style="color:#10b981;">✅</td>
+            <td style="color:var(--gray);">◻️</td>
+          </tr>
+          <tr>
+            <td>تركيب رموش</td>
+            <td style="color:var(--gray);">◻️</td>
+            <td style="color:#10b981;">✅</td>
+            <td style="color:#10b981;">✅</td>
+            <td style="color:var(--gray);">◻️</td>
+            <td style="color:var(--gray);">◻️</td>
+          </tr>
+          <tr>
+            <td>عناية بالبشرة</td>
+            <td style="color:var(--gray);">◻️</td>
+            <td style="color:#10b981;">✅</td>
+            <td style="color:var(--gray);">◻️</td>
+            <td style="color:var(--gray);">◻️</td>
+            <td style="color:var(--gray);">◻️</td>
+          </tr>
+          <tr>
+            <td>كراسي مساج VIP</td>
+            <td style="color:var(--gray);">◻️</td>
+            <td style="color:var(--gray);">◻️</td>
+            <td style="color:var(--gray);">◻️</td>
+            <td style="color:#10b981;">✅</td>
+            <td style="color:var(--gray);">◻️</td>
+          </tr>
+          <tr>
+            <td>خدمة متنقلة</td>
+            <td style="color:var(--gray);">◻️</td>
+            <td style="color:var(--gray);">◻️</td>
+            <td style="color:#10b981;">✅</td>
+            <td style="color:var(--gray);">◻️</td>
+            <td style="color:var(--gray);">◻️</td>
+          </tr>
+          <tr>
+            <td>فروع متعددة</td>
+            <td style="color:var(--gray);">◻️</td>
+            <td style="color:var(--gray);">◻️</td>
+            <td style="color:#10b981;">✅</td>
+            <td style="color:var(--gray);">◻️</td>
+            <td style="color:#10b981;">✅</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 13: RECOMMENDATIONS ===== -->
+  <div class="slide" data-slide="13">
+    <div class="floating-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
+    <div class="corner-decoration top-right"></div>
+
+    <div class="section-header" style="margin-bottom: 16px;">
+      <div class="section-number">12</div>
+      <div class="section-title">التوصيات والفرص</div>
+      <div class="red-accent-line"></div>
+      <div class="section-subtitle">استراتيجيات مقترحة للتميز في سوق صالونات الأظافر بالتجمع الخامس</div>
+    </div>
+
+    <div class="reco-grid">
+      <div class="reco-card">
+        <div class="reco-number">١</div>
+        <div class="reco-icon">🧼</div>
+        <div class="reco-title">الشفافية في التعقيم</div>
+        <div class="reco-desc">
+          عرض بروتوكولات التعقيم بشكل مرئي وواضح للعميلات. استخدام أوتوكلاف طبي مرئي وأدوات معقمة بتغليف فردي. هذا يمثل ميزة تنافسية حاسمة حيث أن العميلات أصبحن أكثر وعياً بالعدوى.
+        </div>
+      </div>
+      <div class="reco-card">
+        <div class="reco-number">٢</div>
+        <div class="reco-icon">📱</div>
+        <div class="reco-title">نظام حجز ذكي</div>
+        <div class="reco-desc">
+          تطوير نظام حجز إلكتروني سلس عبر واتساب أو تطبيق خاص بدلاً من الاعتماد على الرسائل اليدوية البطيئة. العميلات في التجمع يفضلن السرعة والمرونة في الحجز.
+        </div>
+      </div>
+      <div class="reco-card">
+        <div class="reco-number">٣</div>
+        <div class="reco-icon">🎫</div>
+        <div class="reco-title">باقات اشتراك شهرية</div>
+        <div class="reco-desc">
+          تقديم اشتراكات شهرية تشمل عدد محدد من جلسات الـ Refill والمانيكير والباديكير. هذا يضمن تدفق إيرادات متكرر ومستمر وبناء قاعدة عملاء وفية.
+        </div>
+      </div>
+      <div class="reco-card">
+        <div class="reco-number">٤</div>
+        <div class="reco-icon">🧕</div>
+        <div class="reco-title">أقسام مخصصة للمحجبات</div>
+        <div class="reco-desc">
+          فرصة غير مستغلة — لا يوجد صالون حالياً يوفر أقساماً مخصصة ومنفصلة للمحجبات. تقديم هذه الخدمة سيستقطب شريحة كبيرة من السوق غير المخدومة.
+        </div>
+      </div>
+      <div class="reco-card">
+        <div class="reco-number">٥</div>
+        <div class="reco-icon">🚐</div>
+        <div class="reco-title">توسيع الخدمات المتنقلة</div>
+        <div class="reco-desc">
+          خدمة الصالون المتنقل (Home Service) لم تُستغل بشكل كافٍ. تقديم خدمة منزلية احترافية مع نفس مستوى الجودة والتعقيم يمكن أن يفتح قناة إيرادات جديدة.
+        </div>
+      </div>
+      <div class="reco-card">
+        <div class="reco-number">٦</div>
+        <div class="reco-icon">📊</div>
+        <div class="reco-title">تعزيز الحضور الرقمي</div>
+        <div class="reco-desc">
+          استثمار قوي في المحتوى على إنستجرام وتيك توك مع فيديوهات Before/After وتصوير احترافي لنتائج الـ Nail Art. المحتوى البصري هو المحرك الأول لقرار الاختيار.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 14: CLOSING ===== -->
+  <div class="slide" data-slide="14">
+    <div class="floating-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
+    <div class="corner-decoration top-right"></div>
+    <div class="corner-decoration bottom-left"></div>
+
+    <div class="end-slide">
+      <img src="sun_media_logo.png" alt="Sun Media Logo" class="cover-logo" style="width:100px;">
+      <div style="color:var(--red);font-size:16px;font-weight:700;margin-bottom:20px;">Sun Media Advertising Agency</div>
+      <div class="end-tagline">
+        <span>Let Your Business</span> Shine <span>With Us</span>
+      </div>
+      <div class="red-accent-line" style="margin: 20px auto;"></div>
+      <div style="font-size:16px;color:var(--gray-light);max-width:600px;margin:0 auto;line-height:1.8;">
+        نساعدك في بناء استراتيجية تسويقية متكاملة تضعك في صدارة المنافسة.
+        <br>هذه الدراسة هي الخطوة الأولى نحو تحقيق التميز في سوق العناية بالأظافر.
+      </div>
+
+      <div class="end-contact">
+        <div class="end-contact-item">
+          <span class="cicon">📞</span>
+          010 30 8000 42
+        </div>
+        <div class="end-contact-item">
+          <span class="cicon">📍</span>
+          دمياط • القاهرة • الإسكندرية
+        </div>
+      </div>
+
+      <div style="margin-top:40px;padding:16px 32px;background:rgba(230,57,70,0.08);border:1px solid rgba(230,57,70,0.2);border-radius:12px;display:inline-block;">
+        <div style="font-size:14px;color:var(--red);font-weight:700;">الخطوات التالية</div>
+        <div style="font-size:13px;color:var(--gray-light);margin-top:6px;line-height:1.7;">
+          ① تصميم هوية بصرية مميزة &nbsp;|&nbsp;
+          ② استراتيجية محتوى رقمي &nbsp;|&nbsp;
+          ③ خطة تسعير تنافسية &nbsp;|&nbsp;
+          ④ حملات إعلانية مستهدفة
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- NAVIGATION -->
+<div class="keyboard-hint">استخدم الأسهم ← → للتنقل بين الشرائح</div>
+<div class="nav-controls">
+  <button class="nav-btn" id="nextBtn" onclick="navigate(1)">→</button>
+  <div class="progress-dots" id="progressDots"></div>
+  <div class="slide-counter" id="slideCounter"></div>
+  <button class="nav-btn" id="prevBtn" onclick="navigate(-1)">←</button>
+</div>
+
+<script>
+  let currentSlide = 0;
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  const progressDots = document.getElementById('progressDots');
+  const slideCounter = document.getElementById('slideCounter');
+
+  // Create progress dots
+  for (let i = 0; i < totalSlides; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'progress-dot' + (i === 0 ? ' active' : '');
+    dot.onclick = () => goToSlide(i);
+    progressDots.appendChild(dot);
+  }
+
+  function updateSlide() {
+    slides.forEach((slide, i) => {
+      slide.classList.remove('active', 'prev');
+      if (i === currentSlide) slide.classList.add('active');
+      else if (i < currentSlide) slide.classList.add('prev');
+    });
+
+    // Update dots
+    document.querySelectorAll('.progress-dot').forEach((dot, i) => {
+      dot.classList.toggle('active', i === currentSlide);
+    });
+
+    // Update counter
+    slideCounter.textContent = (currentSlide + 1) + ' / ' + totalSlides;
+
+    // Update buttons
+    document.getElementById('prevBtn').disabled = currentSlide === 0;
+    document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+
+    // Animate bars when on chart slides
+    if (currentSlide === 8) animateBars();
+  }
+
+  function navigate(dir) {
+    const next = currentSlide + dir;
+    if (next >= 0 && next < totalSlides) {
+      currentSlide = next;
+      updateSlide();
+    }
+  }
+
+  function goToSlide(index) {
+    currentSlide = index;
+    updateSlide();
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') navigate(1);    // RTL: left = forward
+    else if (e.key === 'ArrowRight') navigate(-1); // RTL: right = back
+    else if (e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); navigate(1); }
+    else if (e.key === 'ArrowUp') navigate(-1);
+  });
+
+  // Touch support
+  let touchStartX = 0;
+  document.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; });
+  document.addEventListener('touchend', (e) => {
+    const diff = touchStartX - e.changedTouches[0].screenX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) navigate(1);  // swipe left = forward in RTL
+      else navigate(-1);
+    }
+  });
+
+  // Animate bar charts
+  function animateBars() {
+    document.querySelectorAll('.bar-fill').forEach(bar => {
+      const width = bar.getAttribute('data-width');
+      bar.style.width = '0';
+      setTimeout(() => {
+        bar.style.width = width + '%';
+      }, 100);
+    });
+  }
+
+  // Initial state
+  updateSlide();
+</script>
+
+</body>
+</html>
